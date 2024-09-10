@@ -7,13 +7,11 @@ export class QuoteController {
   constructor(private readonly quoteService: QuoteService) {}
   @Post()
   async create(@Body() createQuoteDto:CreateQuoteDto){
-    console.log('quote post',createQuoteDto)
     return this.quoteService.create(createQuoteDto);
   }
 
   @Get('history')
   async getHistory(@Query('userId') userId:number){
-    console.log('HISSSSSSSSStor',userId)
     return this.quoteService.findUserQuotes(+userId);
   }  
 

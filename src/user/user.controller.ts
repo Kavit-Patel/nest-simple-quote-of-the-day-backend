@@ -14,7 +14,6 @@ export class UserController {
     }
   @Post('login')
   async login(@Body() loginuserDto: LoginUserDto ){
-    console.log('Login cont',loginuserDto)
     const user = await this.userService.loginUser(loginuserDto.email,loginuserDto.password)
     if(!user){
       throw new NotFoundException('User not found')

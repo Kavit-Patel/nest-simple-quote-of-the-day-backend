@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ValidationPipe } from '@nestjs/common';
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
 
@@ -23,22 +24,11 @@ async function bootstrap() {
     methods:'GET,POST,PUT,PATCH,DELETE,OPTIONS',
     allowedHeaders:'Content-Type,Authorization',
   })
-
-  // Set up session middleware
-  console.log('sese',process.env.SESSION_SECRET)
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET || ' ', 
-      resave: false,
-      saveUninitialized: false,
-      cookie: { secure: false }, // Set to true if using HTTPS
-    }),
-  );
-
-  // Initialize Passport
-  app.use(passport.initialize());
-  app.use(passport.session());
-
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true, 
+    transform: true,  
+   }));
 
   const config = new DocumentBuilder()
     .setTitle('Quote of the Day API')
