@@ -1,7 +1,9 @@
-import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Post, Request, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
@@ -12,6 +14,7 @@ export class UserController {
       const user = await this.userService.createUser(createUserDto.email,createUserDto.password);
       return user
     }
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Body() loginuserDto: LoginUserDto ){
     const user = await this.userService.loginUser(loginuserDto.email,loginuserDto.password)
@@ -20,6 +23,20 @@ export class UserController {
     }
     return user
   }
+
+@Get('profile')
+@UseGuards(AuthGuard('session'))
+async profile(@Request() req) {
+  const currentUserId = req.session?.passport?.user
+  if (req.user) {
+    return req.user;
+  } 
+  if(currentUserId){
+    const user = await this.userService.findById(currentUserId)
+    return user
+  }
+    throw new NotFoundException('Log In to save this quote to your history !');
   
+}
 
 }
